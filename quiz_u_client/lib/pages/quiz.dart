@@ -4,9 +4,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiz_u_client/api/score.dart';
 import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/pages/home.dart';
+import 'package:quiz_u_client/pages/otp.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const QuizDuration = Duration(seconds: 360);
 
@@ -36,7 +39,7 @@ class QuestionsWidget extends ConsumerStatefulWidget {
   bool skipUsed = false;
 
   /// countdownTimer is only responsible for what happens after the quiz ends
-  Timer? countdownTimer;
+  Timer? quizTimer;
 
   QuestionsWidget({Key? key, required this.questions}) : super(key: key);
 
@@ -45,7 +48,7 @@ class QuestionsWidget extends ConsumerStatefulWidget {
 }
 
 class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
-  /// Clock is what drives the re-renders of quizDuration
+  /// Clock is what drives the re-renders of this widget
   Timer? clock;
 
   @override
@@ -62,11 +65,11 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
   void dispose() {
     super.dispose();
     clock!.cancel();
-    widget.countdownTimer!.cancel();
+    widget.quizTimer!.cancel();
   }
 
   void startTimer({Function? onFinish}) {
-    widget.countdownTimer = Timer(widget.quizDuration, () {
+    widget.quizTimer = Timer(widget.quizDuration, () {
       debugPrint("Timer finished");
       if (onFinish != null) {
         onFinish();
@@ -79,7 +82,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     setState(() {
       final seconds = widget.quizDuration.inSeconds - 1;
       if (seconds < 0) {
-        widget.countdownTimer!.cancel();
+        widget.quizTimer!.cancel();
       } else {
         widget.quizDuration = Duration(seconds: seconds);
       }
@@ -110,6 +113,19 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     });
   }
 
+  void postResult() async {
+    // get shared prefrences
+    var pref = await SharedPreferences.getInstance();
+    var response = await postScore(
+        token: pref.getString('token')!, score: widget.score.toString());
+    if (response == null) {
+      showErrorSnackBar(
+          context, "Sorry, we could not add your score to the leaderbords.");
+    } else {
+      debugPrint(response.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String strDigits(int n) {
@@ -124,6 +140,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     if (!widget.failedQuiz) {
       if ((widget.questionIndex + 1) > widget.questions.length) {
         stopTimer();
+        postResult();
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

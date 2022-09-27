@@ -1,14 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiz_u_client/api/name.dart';
 import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/main.dart';
+import 'package:quiz_u_client/pages/otp.dart';
+import 'package:quiz_u_client/utils/string_extensions.dart';
+
+final nameProvider = StateProvider((ref) => '');
 
 class NamePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var name = ref.watch(nameProvider);
+    var prefs = ref.watch(sharedPreferencesProvider).value;
     return PageContainer(
         child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text('Name Page'),
+        const Text(
+          'QuizU',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Text('Enter your name'),
+        const SizedBox(height: 20),
+        TextField(
+          onChanged: (value) => ref.read(nameProvider.notifier).state = value,
+          decoration: const InputDecoration(
+              border: OutlineInputBorder(), hintText: "John Doe"),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () async {
+            if (name.trim().isEmpty) {
+              showErrorSnackBar(context, 'Please enter a valid name');
+            } else {
+              var response = await updateName(
+                  newName: name, token: prefs?.getString('token'));
+              if (response == null) {
+                showErrorSnackBar(context, 'Something went wrong');
+              } else {
+                await prefs?.setString('name', name);
+                Navigator.pushReplacementNamed(context, Routes.home);
+              }
+            }
+          },
+          child: const Text('Continue'),
+        ),
       ],
     ));
   }

@@ -10,34 +10,38 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // get shared preferences
     var perf = ref.watch(sharedPreferencesProvider).value;
     return PageContainer(
       xPadding: 0.0,
-      child: Column(children: [
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text('QuizU'),
-              const SizedBox(height: 20),
-              const Text('Ready to start the Quiz?'),
-              Text("Your token is ${perf!.getString("token")}"),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  debugPrint("Your token is ${perf!.getString("token")}");
-                  Navigator.pushNamed(context, '/quiz');
-                },
-                child: const Text('Start Quiz'),
-              ),
-            ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text('QuizU',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                Text('Ready to start the Quiz, ${perf!.getString('name')}?'),
+                // Text("Your token is ${perf.getString("token")}"),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    debugPrint("Your token is ${perf.getString("token")}");
+                    Navigator.pushNamed(context, '/quiz');
+                  },
+                  child: const Text('Start Quiz'),
+                ),
+              ],
+            ),
           ),
-        ),
-        // Tab Navigation
-        BottomNavigation(),
-      ]),
+          // Tab Navigation
+          BottomNavigation(),
+        ]),
+      ),
     );
   }
 }

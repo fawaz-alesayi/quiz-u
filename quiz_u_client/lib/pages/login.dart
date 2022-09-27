@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phone_number/phone_number.dart';
@@ -19,15 +20,24 @@ final dialogCode = StateProvider<String>((ref) => "SA");
 final phoneNumberProvider = StateProvider<String>((ref) => "");
 
 /// A page that contains a input form for a mobile number and a button to send an OTP.
-class LoginPage extends ConsumerWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var selectedRegionCode = ref.watch(dialogCode);
     var perf = ref.watch(sharedPreferencesProvider).value;
-    redirectToHomeIfLoggedIn(context, perf);
-
     return PageContainer(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

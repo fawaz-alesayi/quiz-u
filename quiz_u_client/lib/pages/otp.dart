@@ -20,7 +20,6 @@ class OtpPage extends ConsumerWidget {
     var otp = ref.watch(otpProvider);
     var phoneNumber = ref.watch(phoneNumberProvider);
     var sharedPrefs = ref.watch(sharedPreferencesProvider).value;
-    redirectToHomeIfLoggedIn(context, sharedPrefs);
 
     return PageContainer(
       child: Column(

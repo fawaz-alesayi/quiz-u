@@ -6,28 +6,31 @@ import 'package:quiz_u_client/pages/login.dart';
 import 'package:quiz_u_client/pages/name.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:quiz_u_client/pages/profile.dart';
+import 'package:quiz_u_client/pages/splash.dart';
+import 'package:quiz_u_client/utils/auth_redirect.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-final sharedPreferencesProvider = FutureProvider.autoDispose((ref) async {
+final sharedPreferencesProvider = FutureProvider((ref) async {
   return await SharedPreferences.getInstance();
 });
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var prefs = ref.watch(sharedPreferencesProvider).value;
     return MaterialApp(
       title: 'QuizU',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      home: SplashScreen(),
       routes: {
         Routes.login: (context) => const LoginPage(),
         Routes.home: (context) => const HomePage(),

@@ -8,6 +8,8 @@ import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/pages/home.dart';
 
+const QuizDuration = Duration(seconds: 5);
+
 class QuizPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,8 +31,11 @@ class QuestionsWidget extends ConsumerStatefulWidget {
   final List<Question> questions;
   int questionIndex = 0;
   bool failedQuiz = false;
-  Duration quizDuration = Duration(seconds: 4);
+  Duration quizDuration = QuizDuration;
+
+  /// countdownTimer is only responsible for what happens after the quiz ends
   Timer? countdownTimer;
+
   QuestionsWidget({Key? key, required this.questions}) : super(key: key);
 
   @override
@@ -38,15 +43,24 @@ class QuestionsWidget extends ConsumerStatefulWidget {
 }
 
 class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
+  /// Clock is what drives the re-renders of quizDuration
+  Timer? clock;
+
   @override
   void initState() {
     super.initState();
     startTimer(onFinish: () {
-      setState(() {
-        widget.failedQuiz = true;
-        widget.questionIndex = 0;
-      });
+      widget.failedQuiz = true;
+      widget.questionIndex = 0;
     });
+  }
+
+  /// clear timers when this widget gets removed
+  @override
+  void dispose() {
+    super.dispose();
+    clock!.cancel();
+    widget.countdownTimer!.cancel();
   }
 
   void startTimer({Function? onFinish}) {
@@ -56,7 +70,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         onFinish();
       }
     });
-    Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+    clock = Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
   }
 
   void setCountDown() {
@@ -70,6 +84,29 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     });
   }
 
+  void stopTimer() {
+    setState(() => clock!.cancel());
+  }
+
+  void resetTimer() {
+    stopTimer();
+    setState(() {
+      widget.quizDuration = QuizDuration;
+    });
+  }
+
+  void resetQuiz() {
+    setState(() {
+      widget.failedQuiz = false;
+      widget.questionIndex = 0;
+    });
+    resetTimer();
+    startTimer(onFinish: () {
+      widget.failedQuiz = true;
+      widget.questionIndex = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String strDigits(int n) {
@@ -79,10 +116,8 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       return n.toString().padLeft(2, '0');
     }
 
-    // Step 7
     final minutes = strDigits(widget.quizDuration.inMinutes.remainder(60));
-    final seconds =
-        strDigits((widget.quizDuration.inSeconds - 1).remainder(60));
+    final seconds = strDigits((widget.quizDuration.inSeconds).remainder(60));
     if (!widget.failedQuiz) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -123,10 +158,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
           Text("Wrong Answer. You failed the quiz 😔."),
           TextButton(
               onPressed: () {
-                setState(() {
-                  widget.questionIndex = 0;
-                  widget.failedQuiz = false;
-                });
+                resetQuiz();
               },
               child: Text("Retry the quiz"))
         ],

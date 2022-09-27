@@ -71,8 +71,13 @@ class OtpPage extends ConsumerWidget {
                 } else {
                   // save the token in shared preferences
                   sharedPrefs!.setString('token', response.token);
+
+                  if (response.name == null) {
+                    Navigator.pushReplacementNamed(context, Routes.name);
+                    return;
+                  }
                 }
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, Routes.home);
               }
             },
             child: const Text('Verify'),

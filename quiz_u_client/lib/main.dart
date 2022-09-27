@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/pages/home.dart';
@@ -6,8 +8,8 @@ import 'package:quiz_u_client/pages/login.dart';
 import 'package:quiz_u_client/pages/name.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:quiz_u_client/pages/profile.dart';
+import 'package:quiz_u_client/pages/quiz.dart';
 import 'package:quiz_u_client/pages/splash.dart';
-import 'package:quiz_u_client/utils/auth_redirect.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -32,12 +34,13 @@ class MyApp extends ConsumerWidget {
       ),
       home: SplashScreen(),
       routes: {
-        Routes.login: (context) => const LoginPage(),
-        Routes.home: (context) => const HomePage(),
-        Routes.otp: (context) => const OtpPage(),
-        Routes.leaderboard: (context) => const LeaderboardPage(),
+        Routes.login: (context) => LoginPage(),
+        Routes.home: (context) => HomePage(),
+        Routes.otp: (context) => OtpPage(),
+        Routes.leaderboard: (context) => LeaderboardPage(),
         Routes.profile: (context) => ProfilePage(),
         Routes.name: (context) => NamePage(),
+        Routes.quiz: (context) => QuizPage(),
       },
     );
   }
@@ -50,4 +53,5 @@ abstract class Routes {
   static const String leaderboard = '/leaderboard';
   static const String profile = '/profile';
   static const String name = '/name';
+  static const String quiz = '/quiz';
 }

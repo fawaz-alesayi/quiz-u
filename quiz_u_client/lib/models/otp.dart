@@ -8,7 +8,6 @@ class OTPRequest {
     required this.otp,
     required this.mobile,
   });
-  
 
   OTPRequest copyWith({
     String? otp,
@@ -36,7 +35,8 @@ class OTPRequest {
 
   String toJson() => json.encode(toMap());
 
-  factory OTPRequest.fromJson(String source) => OTPRequest.fromMap(json.decode(source));
+  factory OTPRequest.fromJson(String source) =>
+      OTPRequest.fromMap(json.decode(source));
 
   @override
   String toString() => 'OTPRequest(OTP: $otp, mobile: $mobile)';
@@ -44,10 +44,8 @@ class OTPRequest {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
-    return other is OTPRequest &&
-      other.otp == otp &&
-      other.mobile == mobile;
+
+    return other is OTPRequest && other.otp == otp && other.mobile == mobile;
   }
 
   @override
@@ -58,15 +56,18 @@ class OTPResponse {
   bool success;
   String userStatus;
   String message;
+  String? name;
   String token;
+  String? mobile;
 
   OTPResponse({
     required this.success,
     required this.userStatus,
     required this.message,
+    this.name,
     required this.token,
+    this.mobile,
   });
-  
 
   OTPResponse copyWith({
     bool? success,
@@ -87,7 +88,9 @@ class OTPResponse {
       'success': success,
       'user_status': userStatus,
       'message': message,
+      'name': name,
       'token': token,
+      'mobile': mobile,
     };
   }
 
@@ -96,30 +99,39 @@ class OTPResponse {
       success: map['success'] ?? false,
       userStatus: map['user_status'] ?? '',
       message: map['message'] ?? '',
+      name: map['name'] ?? '',
       token: map['token'] ?? '',
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory OTPResponse.fromJson(String source) => OTPResponse.fromMap(json.decode(source));
+  factory OTPResponse.fromJson(String source) =>
+      OTPResponse.fromMap(json.decode(source));
 
   @override
-  String toString() => 'OTPResponse(success: $success, userStatus: $userStatus, message: $message, token: $token)';
+  String toString() =>
+      'OTPResponse(success: $success, userStatus: $userStatus, message: $message, token: $token)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is OTPResponse &&
-      other.success == success &&
-      other.userStatus == userStatus &&
-      other.message == message &&
-      other.token == token;
+        other.success == success &&
+        other.userStatus == userStatus &&
+        other.message == message &&
+        other.token == token &&
+        other.mobile == mobile &&
+        other.name == name;
   }
 
   @override
-  int get hashCode => success.hashCode ^ userStatus.hashCode ^ message.hashCode ^ token.hashCode;
+  int get hashCode =>
+      success.hashCode ^
+      userStatus.hashCode ^
+      message.hashCode ^
+      token.hashCode;
 }
 
 abstract class UserStatus {

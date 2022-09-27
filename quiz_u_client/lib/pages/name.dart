@@ -4,7 +4,6 @@ import 'package:quiz_u_client/api/name.dart';
 import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/pages/otp.dart';
-import 'package:quiz_u_client/utils/string_extensions.dart';
 
 final nameProvider = StateProvider((ref) => '');
 
@@ -40,7 +39,7 @@ class NamePage extends ConsumerWidget {
               var response = await updateName(
                   newName: name, token: prefs?.getString('token'));
               if (response == null) {
-                showErrorSnackBar(context, 'Something went wrong');
+                showErrorSnackBar(context, 'Sorry, something went wrong');
               } else {
                 await prefs?.setString('name', name);
                 Navigator.pushReplacementNamed(context, Routes.home);

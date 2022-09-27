@@ -33,15 +33,6 @@ Future<NewUserNameResponse?> updateName(
   }
 }
 
-/*
-Convert the following into a dart class
-{
-  "success": true,
-  "message": "User Name has been updated!",
-  "name": "Okoul",
-  "mobile": "05987654321"
-}
-*/
 class NewUserNameResponse {
   bool success;
   String message;

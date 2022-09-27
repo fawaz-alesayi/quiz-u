@@ -8,7 +8,7 @@ import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/pages/home.dart';
 
-const QuizDuration = Duration(seconds: 5);
+const QuizDuration = Duration(seconds: 360);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -30,8 +30,10 @@ class QuizPage extends ConsumerWidget {
 class QuestionsWidget extends ConsumerStatefulWidget {
   final List<Question> questions;
   int questionIndex = 0;
+  int score = 0;
   bool failedQuiz = false;
   Duration quizDuration = QuizDuration;
+  bool skipUsed = false;
 
   /// countdownTimer is only responsible for what happens after the quiz ends
   Timer? countdownTimer;
@@ -99,6 +101,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     setState(() {
       widget.failedQuiz = false;
       widget.questionIndex = 0;
+      widget.skipUsed = false;
     });
     resetTimer();
     startTimer(onFinish: () {
@@ -119,6 +122,25 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     final minutes = strDigits(widget.quizDuration.inMinutes.remainder(60));
     final seconds = strDigits((widget.quizDuration.inSeconds).remainder(60));
     if (!widget.failedQuiz) {
+      if ((widget.questionIndex + 1) > widget.questions.length) {
+        stopTimer();
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text("Time left: $minutes:$seconds"),
+            SizedBox(height: 20),
+            Text("You finished the quiz!"),
+            SizedBox(height: 20),
+            Text("Your score was ${widget.score}/${widget.questions.length}"),
+            TextButton(
+                onPressed: () {
+                  resetQuiz();
+                },
+                child: Text("Restart quiz"))
+          ],
+        );
+      }
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,7 +149,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
           SizedBox(height: 20),
           Text(widget.questions[widget.questionIndex].question),
           for (var answer
-              in widget.questions[widget.questionIndex].answers.entries)
+              in widget.questions[widget.questionIndex].answers.entries) ...{
             TextButton(
                 onPressed: () {
                   if (correct(
@@ -136,8 +158,8 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                         "Answered to question ${widget.questionIndex} correctly");
                     // Move to next question
                     setState(() {
+                      widget.score++;
                       widget.questionIndex++;
-                      debugPrint("${widget.questionIndex}");
                     });
                   } else {
                     debugPrint(
@@ -147,7 +169,18 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                     });
                   }
                 },
-                child: Text("${answer.key}. ${answer.value}"))
+                child: Text("${answer.key}. ${answer.value}")),
+          },
+          if (!widget.skipUsed) ...{
+            ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    widget.skipUsed = true;
+                    widget.questionIndex++;
+                  });
+                },
+                child: Text("Skip"))
+          }
         ],
       );
     } else {
@@ -156,7 +189,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Wrong Answer. You failed the quiz 😔."),
-          TextButton(
+          ElevatedButton(
               onPressed: () {
                 resetQuiz();
               },

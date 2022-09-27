@@ -29,7 +29,7 @@ class QuestionsWidget extends ConsumerStatefulWidget {
   final List<Question> questions;
   int questionIndex = 0;
   bool failedQuiz = false;
-  Duration quizDuration = Duration(seconds: 3);
+  Duration quizDuration = Duration(seconds: 4);
   Timer? countdownTimer;
   QuestionsWidget({Key? key, required this.questions}) : super(key: key);
 
@@ -41,19 +41,27 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
   @override
   void initState() {
     super.initState();
-    startTimer();
+    startTimer(onFinish: () {
+      setState(() {
+        widget.failedQuiz = true;
+        widget.questionIndex = 0;
+      });
+    });
   }
 
-  void startTimer() {
-    widget.countdownTimer =
-        Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+  void startTimer({Function? onFinish}) {
+    widget.countdownTimer = Timer(widget.quizDuration, () {
+      debugPrint("Timer finished");
+      if (onFinish != null) {
+        onFinish();
+      }
+    });
+    Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
   }
 
   void setCountDown() {
-    const reduceSecondsBy = 1;
     setState(() {
-      final seconds = widget.quizDuration.inSeconds - reduceSecondsBy;
-      
+      final seconds = widget.quizDuration.inSeconds - 1;
       if (seconds < 0) {
         widget.countdownTimer!.cancel();
       } else {
@@ -64,10 +72,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String strDigits(int n) => n.toString().padLeft(2, '0');
+    String strDigits(int n) {
+      if (n < 0) {
+        return "0".padLeft(2, '0');
+      }
+      return n.toString().padLeft(2, '0');
+    }
+
     // Step 7
     final minutes = strDigits(widget.quizDuration.inMinutes.remainder(60));
-    final seconds = strDigits(widget.quizDuration.inSeconds.remainder(60));
+    final seconds =
+        strDigits((widget.quizDuration.inSeconds - 1).remainder(60));
     if (!widget.failedQuiz) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,

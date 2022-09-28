@@ -30,6 +30,18 @@ class ProfilePage extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              onPressed: () async {
+                var pref = await ref.watch(sharedPreferencesProvider.future);
+                await pref.clear();
+                // navigate to login
+                Navigator.pushReplacementNamed(context, Routes.login);
+              },
+              icon: const Icon(Icons.logout),
+            ),
+          ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

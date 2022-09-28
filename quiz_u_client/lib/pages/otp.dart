@@ -6,6 +6,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quiz_u_client/api/login.dart';
 import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/main.dart';
+import 'package:quiz_u_client/models/otp.dart';
 import 'package:quiz_u_client/pages/login.dart';
 import 'package:quiz_u_client/utils/auth_redirect.dart';
 
@@ -68,14 +69,17 @@ class OtpPage extends ConsumerWidget {
                   } else {
                     showErrorSnackBar(context, "Sorry! Something went wrong");
                   }
+                } else if (response.message == "Token returning!") {
+                  debugPrint("Returning User");
+                  debugPrint(response.toString());
+                  sharedPrefs!.setString('token', response.token);
+                  sharedPrefs.setString('name', response.name!);
+                  Navigator.pushReplacementNamed(context, Routes.navigation);
                 } else {
                   // save the token in shared preferences
                   sharedPrefs!.setString('token', response.token);
 
-                  if (response.name == null) {
-                    Navigator.pushReplacementNamed(context, Routes.name);
-                    return;
-                  }
+                  Navigator.pushReplacementNamed(context, Routes.name);
                 }
                 Navigator.pushReplacementNamed(context, Routes.navigation);
               }

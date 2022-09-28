@@ -2,7 +2,7 @@ import 'dart:convert';
 
 class User {
   String token;
-  String name;
+  String? name;
   String mobile;
 
   User({
@@ -34,7 +34,7 @@ class User {
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
       token: map['token'] ?? '',
-      name: map['name'] ?? '',
+      name: map['name'],
       mobile: map['mobile'] ?? '',
     );
   }

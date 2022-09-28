@@ -34,10 +34,7 @@ class ProfilePage extends ConsumerWidget {
             alignment: Alignment.topRight,
             child: IconButton(
               onPressed: () async {
-                var pref = await ref.watch(sharedPreferencesProvider.future);
-                await pref.clear();
-                // navigate to login
-                Navigator.pushReplacementNamed(context, Routes.login);
+                await logout(ref, context);
               },
               icon: const Icon(Icons.logout),
             ),
@@ -72,6 +69,13 @@ class ProfilePage extends ConsumerWidget {
     }, error: (e, s) {
       return const Center(child: Text('Error'));
     });
+  }
+
+  Future<void> logout(WidgetRef ref, BuildContext context) async {
+    var pref = await ref.watch(sharedPreferencesProvider.future);
+    await pref.clear();
+    // navigate to login
+    Navigator.pushReplacementNamed(context, Routes.login);
   }
 }
 

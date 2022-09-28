@@ -11,6 +11,7 @@ import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/models/quizAttempt.dart';
 import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const QuizDuration = Duration(seconds: 5);
@@ -211,7 +212,15 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                         onPressed: () {
                           resetQuiz();
                         },
-                        child: Text("Restart quiz"))
+                        child: Text("Restart quiz")),
+                    // Share button
+                    OutlinedButton(
+                      onPressed: () {
+                        Share.share(
+                            "I answered ${score} correct answers in QuizU!");
+                      },
+                      child: Text("Share your score"),
+                    ),
                   ],
                 ),
               ),

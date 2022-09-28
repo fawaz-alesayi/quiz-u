@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/score.dart';
@@ -13,7 +14,7 @@ import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:share_plus/share_plus.dart';
 
-const QuizDuration = Duration(seconds: 120);
+const QuizDuration = Duration(seconds: 600);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -35,7 +36,7 @@ class QuizPage extends ConsumerWidget {
 class QuestionsWidget extends ConsumerStatefulWidget {
   final List<Question> questions;
 
-  const QuestionsWidget({Key? key, required this.questions}) : super(key: key);
+  QuestionsWidget({Key? key, required this.questions}) : super(key: key);
 
   @override
   ConsumerState<QuestionsWidget> createState() => _QuestionsWidgetState();
@@ -44,6 +45,7 @@ class QuestionsWidget extends ConsumerStatefulWidget {
 class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
   /// Clock is what drives the re-renders of this widget. it reduces QuizDuration by 1 second every second
   Timer? clock;
+  late AudioPlayer player;
 
   bool timerFinished = false;
   Duration quizDuration = QuizDuration;
@@ -67,11 +69,13 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       timerFinished = true;
     });
     startTime = DateTime.now();
+    player = AudioPlayer();
   }
 
   /// clear timers when this widget gets removed
   @override
   void dispose() {
+    player.dispose();
     super.dispose();
     clock!.cancel();
     quizTimer!.cancel();
@@ -179,6 +183,14 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       if (((questionIndex + 1) > widget.questions.length) || timerFinished) {
         stopTimer();
         // postResult();
+        if (score < 30) {
+          player.setAsset('assets/audio/finish.wav');
+          player.play();
+        } else {
+          player.setAsset('assets/audio/grand_finish.wav');
+          player.play();
+        }
+
         saveResultLocally(QuizAttempt(
             choices: answers,
             score: score,
@@ -206,17 +218,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                   children: [
                     Text("Time left: $minutes:$seconds"),
                     const SizedBox(height: 20),
-                    const Text("You finished the quiz!"),
+                    Text("Your score is $score/${widget.questions.length}",
+                        style: const TextStyle(fontSize: 20)),
+                    // A button with a Share Icon on its trailing
                     const SizedBox(height: 20),
-                    Text("Your score was $score/${widget.questions.length}"),
-                    // Share button
-                    OutlinedButton(
-                      onPressed: () {
-                        Share.share(
-                            "I answered $score correct answers in QuizU!");
-                      },
-                      child: const Text("Share your score"),
-                    ),
+                    ElevatedButton.icon(
+                        onPressed: () {
+                          Share.share(
+                              "I answered $score correct answers in QuizU!");
+                        },
+                        icon: const Icon(Icons.share),
+                        label: const Text("Share")),
                   ],
                 ),
               ),
@@ -228,13 +240,14 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Time left: $minutes:$seconds",
-                style: const TextStyle(fontSize: 14)),
+            Text("$minutes:$seconds", style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
-            Text("You answered $score/${widget.questions.length} correctly"),
+            Text("$score/${widget.questions.length}",
+                style: const TextStyle(fontSize: 16)),
             Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
+              padding: const EdgeInsets.only(bottom: 16.0, top: 16.0),
               child: Text(widget.questions[questionIndex].question,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold)),
             ),
@@ -243,12 +256,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (correct(
                           widget.questions[questionIndex], answer.key)) {
                         debugPrint(
                             "Answered to question $questionIndex correctly");
-                        // Move to next question
+                        // play correct sound on correct answer as long as it's not the last question
+                        if (questionIndex + 1 < widget.questions.length) {
+                          await player.setAsset('assets/audio/correct.wav');
+                          player.play();
+                        }
+
                         setState(() {
                           score++;
                           questionIndex++;
@@ -257,6 +275,8 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                       } else {
                         debugPrint(
                             "Answered to question $questionIndex incorrectly");
+                        await player.setAsset('assets/audio/incorrect.wav');
+                        player.play();
                         setState(() {
                           failedQuiz = true;
                         });
@@ -272,7 +292,9 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
             },
             if (!skipUsed) ...{
               OutlinedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await player.setAsset('assets/audio/skip.wav');
+                    player.play();
                     setState(() {
                       skipUsed = true;
                       questionIndex++;

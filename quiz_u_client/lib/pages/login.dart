@@ -91,8 +91,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 }
 
-Future<bool> validatePhoneNumber(String phoneNumber, String regionCode) async {
+Future<bool> validatePhoneNumber(String? phoneNumber, String regionCode) async {
   var isValid = false;
+  if (phoneNumber == null) {
+    return isValid;
+  }
   try {
     isValid =
         await PhoneNumberUtil().validate(phoneNumber, regionCode: regionCode);

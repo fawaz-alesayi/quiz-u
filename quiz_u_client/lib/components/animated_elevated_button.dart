@@ -36,7 +36,7 @@ class _AnimatedElevatedButtonState extends State<AnimatedElevatedButton> {
             )
             : Text(
                 widget.text,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 14),
               ),
       ),
     );

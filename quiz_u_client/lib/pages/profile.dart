@@ -42,26 +42,29 @@ class ProfilePage extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text('QuizU',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                Text('Name: ${data.name}',
-                    style: const TextStyle(fontSize: 20)),
-                const SizedBox(height: 20),
-                Text('Mobile: ${data.mobile}',
-                    style: const TextStyle(fontSize: 20)),
-                const SizedBox(height: 60),
-                const Text('Previous attempts',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                PreviousAttempts(),
-              ],
+            child: SingleChildScrollView(
+              physics: const ScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text('QuizU',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  Text('Name: ${data.name}',
+                      style: const TextStyle(fontSize: 20)),
+                  const SizedBox(height: 20),
+                  Text('Mobile: ${data.mobile}',
+                      style: const TextStyle(fontSize: 20)),
+                  const SizedBox(height: 60),
+                  const Text('Previous attempts',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  PreviousAttempts(),
+                ],
+              ),
             ),
           ),
         ]),
@@ -91,25 +94,23 @@ class PreviousAttempts extends ConsumerWidget {
       }
       return data.isEmpty
           ? const Center(child: Text('No previous attempts'))
-          : SingleChildScrollView(
-              child: Column(
-                children: data
-                    .map((e) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // first Text contains date and time in this format: XX:XX AM/PM on DD/MM/YYYY
-                              // second Text contains score
-                              Text(formatDate(e.date),
-                                  style: const TextStyle(fontSize: 20)),
-                              Text('${e.score} / ${e.quiz.questions.length}',
-                                  style: const TextStyle(fontSize: 20)),
-                            ],
-                          ),
-                        ))
-                    .toList(),
-              ),
+          : Column(
+              children: data
+                  .map((e) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // first Text contains date and time in this format: XX:XX AM/PM on DD/MM/YYYY
+                            // second Text contains score
+                            Text(formatDate(e.date),
+                                style: const TextStyle(fontSize: 20)),
+                            Text('${e.score} / ${e.quiz.questions.length}',
+                                style: const TextStyle(fontSize: 20)),
+                          ],
+                        ),
+                      ))
+                  .toList(),
             );
     }, loading: () {
       return const Center(child: CircularProgressIndicator());

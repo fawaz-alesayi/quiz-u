@@ -37,9 +37,11 @@ class ProfilePage extends ConsumerWidget {
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
-                  Text('Name: ${data.name}', style: const TextStyle(fontSize: 20)),
+                  Text('Name: ${data.name}',
+                      style: const TextStyle(fontSize: 20)),
                   const SizedBox(height: 20),
-                  Text('Mobile: ${data.mobile}', style: const TextStyle(fontSize: 20)),
+                  Text('Mobile: ${data.mobile}',
+                      style: const TextStyle(fontSize: 20)),
                 ],
               ),
             ),
@@ -49,9 +51,10 @@ class ProfilePage extends ConsumerWidget {
         ),
       );
     }, loading: () {
-      return const Center(child: CircularProgressIndicator());
+      return PageContainer(
+          child: const Center(child: CircularProgressIndicator()));
     }, error: (e, s) {
-      return const Center(child: Text('Error'));
+      return PageContainer(child: const Center(child: Text('Error')));
     });
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quiz_u_client/api/login.dart';
+import 'package:quiz_u_client/components/animated_elevated_button.dart';
 import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/pages/login.dart';
@@ -53,7 +54,7 @@ class OtpPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
+          AnimatedElevatedButton(
             onPressed: () async {
               if (otp.length != 4) {
                 showErrorSnackBar(context, 'Please enter a valid OTP');
@@ -82,7 +83,7 @@ class OtpPage extends ConsumerWidget {
                 Navigator.pushReplacementNamed(context, Routes.navigation);
               }
             },
-            child: const Text('Verify'),
+            text: 'Verify',
           ),
         ],
       ),

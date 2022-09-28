@@ -13,7 +13,7 @@ import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:share_plus/share_plus.dart';
 
-const QuizDuration = Duration(seconds: 5);
+const QuizDuration = Duration(seconds: 120);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -228,41 +228,57 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Time left: $minutes:$seconds"),
+            Text("Time left: $minutes:$seconds",
+                style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 20),
-            Text(widget.questions[questionIndex].question),
+            Text("You answered $score/${widget.questions.length} correctly"),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(widget.questions[questionIndex].question,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+            ),
             for (var answer
                 in widget.questions[questionIndex].answers.entries) ...{
-              TextButton(
-                  onPressed: () {
-                    if (correct(widget.questions[questionIndex], answer.key)) {
-                      debugPrint(
-                          "Answered to question $questionIndex correctly");
-                      // Move to next question
-                      setState(() {
-                        score++;
-                        questionIndex++;
-                        answers.add(answer.key);
-                      });
-                    } else {
-                      debugPrint(
-                          "Answered to question $questionIndex incorrectly");
-                      setState(() {
-                        failedQuiz = true;
-                      });
-                    }
-                  },
-                  child: Text("${answer.key}. ${answer.value}")),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                    onPressed: () {
+                      if (correct(
+                          widget.questions[questionIndex], answer.key)) {
+                        debugPrint(
+                            "Answered to question $questionIndex correctly");
+                        // Move to next question
+                        setState(() {
+                          score++;
+                          questionIndex++;
+                          answers.add(answer.key);
+                        });
+                      } else {
+                        debugPrint(
+                            "Answered to question $questionIndex incorrectly");
+                        setState(() {
+                          failedQuiz = true;
+                        });
+                      }
+                    },
+                    child: Text(
+                      "${answer.key}. ${answer.value}",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+              )
             },
             if (!skipUsed) ...{
-              ElevatedButton(
+              OutlinedButton(
                   onPressed: () {
                     setState(() {
                       skipUsed = true;
                       questionIndex++;
                     });
                   },
-                  child: const Text("Skip"))
+                  child: const Text("Skip (One time use!)"))
             }
           ],
         ),

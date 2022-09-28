@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 /// A scaffold + padding for all pages
 class PageContainer extends StatelessWidget {
-  const PageContainer({Key? key, required this.child, this.xPadding = 32.0}) : super(key: key);
+  const PageContainer({Key? key, required this.child, this.xPadding = 32.0})
+      : super(key: key);
 
   final Widget child;
   final double xPadding;

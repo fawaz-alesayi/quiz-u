@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> RouteToPage() async {
     var prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    var destination = Routes.home;
+    var destination = Routes.navigation;
     if (prefs.getString('name') == null) {
       destination = Routes.name;
     }

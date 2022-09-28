@@ -42,7 +42,7 @@ class NamePage extends ConsumerWidget {
                 showErrorSnackBar(context, 'Sorry, something went wrong');
               } else {
                 await prefs?.setString('name', name);
-                Navigator.pushReplacementNamed(context, Routes.home);
+                Navigator.pushReplacementNamed(context, Routes.navigation);
               }
             }
           },

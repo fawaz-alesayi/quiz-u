@@ -77,7 +77,7 @@ class OtpPage extends ConsumerWidget {
                     return;
                   }
                 }
-                Navigator.pushReplacementNamed(context, Routes.home);
+                Navigator.pushReplacementNamed(context, Routes.navigation);
               }
             },
             child: const Text('Verify'),

@@ -13,6 +13,8 @@ import 'package:quiz_u_client/pages/splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  // ensure shared preferences is initialized
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -35,6 +37,7 @@ class MyApp extends ConsumerWidget {
       home: SplashScreen(),
       routes: {
         Routes.login: (context) => LoginPage(),
+        Routes.navigation: (context) => NavigationPage(),
         Routes.home: (context) => HomePage(),
         Routes.otp: (context) => OtpPage(),
         Routes.leaderboard: (context) => LeaderboardPage(),
@@ -47,11 +50,64 @@ class MyApp extends ConsumerWidget {
 }
 
 abstract class Routes {
-  static const String home = '/home';
   static const String login = '/login';
+  static const String navigation = '/navigation';
+  static const String home = '/home';
   static const String otp = '/otp';
   static const String leaderboard = '/leaderboard';
   static const String profile = '/profile';
   static const String name = '/name';
   static const String quiz = '/quiz';
+}
+
+class NavigationPage extends StatefulWidget {
+  const NavigationPage({Key? key}) : super(key: key);
+
+  @override
+  _NavigationPageState createState() => _NavigationPageState();
+}
+
+class _NavigationPageState extends State<NavigationPage> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static final List<Widget> _widgetOptions = <Widget>[
+    HomePage(),
+    LeaderboardPage(),
+    ProfilePage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: 'Leaderboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
+    );
+  }
 }

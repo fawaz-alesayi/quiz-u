@@ -8,7 +8,7 @@ import 'package:quiz_u_client/models/quiz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final quizProvider = FutureProvider<Quiz?>((ref) async {
-  final pref = await SharedPreferences.getInstance();
+  final pref = await ref.watch(sharedPreferencesProvider.future);
   final quiz = await getQuiz(token: pref.getString('token')!);
   return quiz;
 });

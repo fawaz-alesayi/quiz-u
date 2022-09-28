@@ -3,19 +3,23 @@ import 'dart:convert';
 class User {
   String token;
   String name;
-  
+  String mobile;
+
   User({
     required this.token,
     required this.name,
+    required this.mobile,
   });
 
   User copyWith({
     String? token,
     String? name,
+    String? mobile,
   }) {
     return User(
       token: token ?? this.token,
       name: name ?? this.name,
+      mobile: mobile ?? this.mobile,
     );
   }
 
@@ -23,6 +27,7 @@ class User {
     return {
       'token': token,
       'name': name,
+      'mobile': mobile,
     };
   }
 
@@ -30,6 +35,7 @@ class User {
     return User(
       token: map['token'] ?? '',
       name: map['name'] ?? '',
+      mobile: map['mobile'] ?? '',
     );
   }
 
@@ -38,15 +44,18 @@ class User {
   factory User.fromJson(String source) => User.fromMap(json.decode(source));
 
   @override
-  String toString() => 'User(token: $token, name: $name)';
+  String toString() => 'User(token: $token, name: $name, mobile: $mobile)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is User && other.token == token && other.name == name;
+    return other is User &&
+        other.token == token &&
+        other.name == name &&
+        other.mobile == mobile;
   }
 
   @override
-  int get hashCode => token.hashCode ^ name.hashCode;
+  int get hashCode => token.hashCode ^ name.hashCode ^ mobile.hashCode;
 }

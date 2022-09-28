@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/score.dart';
 import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quiz.dart';
+import 'package:quiz_u_client/models/quizAttempt.dart';
 import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const QuizDuration = Duration(seconds: 360);
+const QuizDuration = Duration(seconds: 10);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -37,8 +39,12 @@ class QuestionsWidget extends ConsumerStatefulWidget {
   bool failedQuiz = false;
   Duration quizDuration = QuizDuration;
   bool skipUsed = false;
+  DateTime? startTime;
 
-  /// countdownTimer is only responsible for what happens after the quiz ends
+  /// Answers given
+  List<String> answers = [];
+
+  /// quizTimer is only responsible for what happens after the quiz ends
   Timer? quizTimer;
 
   QuestionsWidget({Key? key, required this.questions}) : super(key: key);
@@ -48,16 +54,17 @@ class QuestionsWidget extends ConsumerStatefulWidget {
 }
 
 class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
-  /// Clock is what drives the re-renders of this widget
+  /// Clock is what drives the re-renders of this widget. it reduces QuizDuration by 1 second every second
   Timer? clock;
 
   @override
   void initState() {
     super.initState();
     startTimer(onFinish: () {
-      widget.failedQuiz = true;
-      widget.questionIndex = 0;
+      widget.failedQuiz = false;
+      widget.questionIndex = widget.questions.length;
     });
+    widget.startTime = DateTime.now();
   }
 
   /// clear timers when this widget gets removed
@@ -108,14 +115,14 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     });
     resetTimer();
     startTimer(onFinish: () {
-      widget.failedQuiz = true;
-      widget.questionIndex = 0;
+      widget.failedQuiz = false;
+      widget.questionIndex = widget.questions.length;
     });
   }
 
   void postResult() async {
     // get shared prefrences
-    var pref = await SharedPreferences.getInstance();
+    var pref = await ref.watch(sharedPreferencesProvider.future);
     var response = await postScore(
         token: pref.getString('token')!, score: widget.score.toString());
     if (response == null) {
@@ -123,6 +130,22 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
           context, "Sorry, we could not add your score to the leaderbords.");
     } else {
       debugPrint(response.toString());
+    }
+  }
+
+  Future<void> saveResultLocally(QuizAttempt attempt) async {
+    var pref = await ref.watch(sharedPreferencesProvider.future);
+    List<QuizAttempt> attempts = [];
+    for (var attempt in pref.getStringList('quiz_attempts') ?? []) {
+      attempts.add(QuizAttempt.fromJson(attempt));
+    }
+    attempts.add(attempt);
+    var result = await pref.setStringList(
+        'quiz_attempts', attempts.map((e) => e.toJson()).toList());
+    if (!result) {
+      debugPrint("Could not save quiz attempt locally");
+    } else {
+      debugPrint("Saved quiz attempt locally");
     }
   }
 
@@ -141,77 +164,86 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       if ((widget.questionIndex + 1) > widget.questions.length) {
         stopTimer();
         postResult();
-        return Column(
+        saveResultLocally(QuizAttempt(
+            choices: widget.answers,
+            score: widget.score,
+            date: widget.startTime!,
+            quiz: Quiz(questions: widget.questions)));
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Time left: $minutes:$seconds"),
+              SizedBox(height: 20),
+              Text("You finished the quiz!"),
+              SizedBox(height: 20),
+              Text("Your score was ${widget.score}/${widget.questions.length}"),
+              TextButton(
+                  onPressed: () {
+                    resetQuiz();
+                  },
+                  child: Text("Restart quiz"))
+            ],
+          ),
+        );
+      }
+      return Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text("Time left: $minutes:$seconds"),
             SizedBox(height: 20),
-            Text("You finished the quiz!"),
-            SizedBox(height: 20),
-            Text("Your score was ${widget.score}/${widget.questions.length}"),
-            TextButton(
+            Text(widget.questions[widget.questionIndex].question),
+            for (var answer
+                in widget.questions[widget.questionIndex].answers.entries) ...{
+              TextButton(
+                  onPressed: () {
+                    if (correct(
+                        widget.questions[widget.questionIndex], answer.key)) {
+                      debugPrint(
+                          "Answered to question ${widget.questionIndex} correctly");
+                      // Move to next question
+                      setState(() {
+                        widget.score++;
+                        widget.questionIndex++;
+                        widget.answers.add(answer.key);
+                      });
+                    } else {
+                      debugPrint(
+                          "Answered to question ${widget.questionIndex} incorrectly");
+                      setState(() {
+                        widget.failedQuiz = true;
+                      });
+                    }
+                  },
+                  child: Text("${answer.key}. ${answer.value}")),
+            },
+            if (!widget.skipUsed) ...{
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.skipUsed = true;
+                      widget.questionIndex++;
+                    });
+                  },
+                  child: Text("Skip"))
+            }
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Wrong Answer. You failed the quiz 😔."),
+            ElevatedButton(
                 onPressed: () {
                   resetQuiz();
                 },
-                child: Text("Restart quiz"))
+                child: Text("Retry the quiz"))
           ],
-        );
-      }
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text("Time left: $minutes:$seconds"),
-          SizedBox(height: 20),
-          Text(widget.questions[widget.questionIndex].question),
-          for (var answer
-              in widget.questions[widget.questionIndex].answers.entries) ...{
-            TextButton(
-                onPressed: () {
-                  if (correct(
-                      widget.questions[widget.questionIndex], answer.key)) {
-                    debugPrint(
-                        "Answered to question ${widget.questionIndex} correctly");
-                    // Move to next question
-                    setState(() {
-                      widget.score++;
-                      widget.questionIndex++;
-                    });
-                  } else {
-                    debugPrint(
-                        "Answered to question ${widget.questionIndex} incorrectly");
-                    setState(() {
-                      widget.failedQuiz = true;
-                    });
-                  }
-                },
-                child: Text("${answer.key}. ${answer.value}")),
-          },
-          if (!widget.skipUsed) ...{
-            ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    widget.skipUsed = true;
-                    widget.questionIndex++;
-                  });
-                },
-                child: Text("Skip"))
-          }
-        ],
-      );
-    } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text("Wrong Answer. You failed the quiz 😔."),
-          ElevatedButton(
-              onPressed: () {
-                resetQuiz();
-              },
-              child: Text("Retry the quiz"))
-        ],
+        ),
       );
     }
   }

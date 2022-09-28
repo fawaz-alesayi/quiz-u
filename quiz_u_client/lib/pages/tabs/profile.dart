@@ -6,7 +6,7 @@ import 'package:quiz_u_client/api/profile.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quizAttempt.dart';
 
-var quizAttemptProvider = FutureProvider((ref) async {
+var quizAttemptProvider = FutureProvider.autoDispose((ref) async {
   debugPrint("Triggered quizAttemptProvider");
   var pref = await ref.watch(sharedPreferencesProvider.future);
   var attemptsRaw = pref.getStringList('quiz_attempts');

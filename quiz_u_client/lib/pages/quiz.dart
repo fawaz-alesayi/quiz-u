@@ -119,6 +119,8 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       failedQuiz = false;
       questionIndex = 0;
       skipUsed = false;
+      score = 0;
+      answers = [];
     });
     resetTimer();
     startTimer(onFinish: () {
@@ -178,11 +180,11 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       if (((questionIndex + 1) > widget.questions.length) || timerFinished) {
         stopTimer();
         // postResult();
-        // saveResultLocally(QuizAttempt(
-        //     choices: answers,
-        //     score: score,
-        //     date: startTime!,
-        //     quiz: Quiz(questions: widget.questions)));
+        saveResultLocally(QuizAttempt(
+            choices: answers,
+            score: score,
+            date: startTime!,
+            quiz: Quiz(questions: widget.questions)));
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

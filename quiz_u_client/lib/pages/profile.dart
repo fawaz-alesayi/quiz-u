@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/profile.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quizAttempt.dart';
 
@@ -30,6 +29,7 @@ class ProfilePage extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(children: [
+          SizedBox(height: 40),
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
@@ -98,8 +98,7 @@ class PreviousAttempts extends ConsumerWidget {
                             children: [
                               // first Text contains date and time in this format: XX:XX AM/PM on DD/MM/YYYY
                               // second Text contains score
-                              Text(
-                                  '${e.date.hour}:${e.date.minute} ${e.date.hour > 12 ? 'PM' : 'AM'} on ${e.date.day}/${e.date.month}/${e.date.year}',
+                              Text('${formatDate(e.date)}',
                                   style: const TextStyle(fontSize: 20)),
                               Text('${e.score} / ${e.quiz.questions.length}',
                                   style: const TextStyle(fontSize: 20)),
@@ -115,4 +114,21 @@ class PreviousAttempts extends ConsumerWidget {
       return const Center(child: Text('Could not load previous attempts'));
     });
   }
+}
+
+/// Takes a 24-hour DateTime object and returns a string in the format: "XX:XX AM/PM on DD/MM/YYYY"
+///
+/// This converts the date from the 24-hour format into the 12-hour format.
+String formatDate(DateTime date) {
+  var hour = date.hour;
+  var minute = date.minute;
+  var day = date.day;
+  var month = date.month;
+  var year = date.year;
+  var ampm = hour > 12 ? 'PM' : 'AM';
+  hour = hour > 12 ? hour - 12 : hour;
+  // Add padding to hour and minute if they are single digit
+  var hourPadded = hour.toString().padLeft(2, '0');
+  var minutePadded = minute.toString().padLeft(2, '0');
+  return '$hourPadded:$minutePadded $ampm on $day/$month/$year';
 }

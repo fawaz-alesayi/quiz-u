@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/pages/home.dart';
@@ -34,13 +32,13 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreen(),
+      home: const SplashScreen(),
       routes: {
-        Routes.login: (context) => LoginPage(),
-        Routes.navigation: (context) => NavigationPage(),
-        Routes.home: (context) => HomePage(),
-        Routes.otp: (context) => OtpPage(),
-        Routes.leaderboard: (context) => LeaderboardPage(),
+        Routes.login: (context) => const LoginPage(),
+        Routes.navigation: (context) => const NavigationPage(),
+        Routes.home: (context) => const HomePage(),
+        Routes.otp: (context) => const OtpPage(),
+        Routes.leaderboard: (context) => const LeaderboardPage(),
         Routes.profile: (context) => ProfilePage(),
         Routes.name: (context) => NamePage(),
         Routes.quiz: (context) => QuizPage(),
@@ -72,8 +70,8 @@ class _NavigationPageState extends State<NavigationPage> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static final List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
-    LeaderboardPage(),
+    const HomePage(),
+    const LeaderboardPage(),
     ProfilePage(),
   ];
 

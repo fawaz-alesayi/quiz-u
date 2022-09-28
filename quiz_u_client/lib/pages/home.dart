@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/quiz.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quiz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final quizProvider = FutureProvider<Quiz?>((ref) async {
   final pref = await ref.watch(sharedPreferencesProvider.future);
@@ -34,10 +32,9 @@ class HomePage extends ConsumerWidget {
               Text(
                 'Ready to start the Quiz, ${perf?.getString('name')}?',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  
                 ),
               ),
               // Text("Your token is ${perf.getString("token")}"),

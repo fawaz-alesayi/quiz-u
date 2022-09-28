@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/leaderboard.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
 import 'package:quiz_u_client/main.dart';
 
 var leaderboardProvider = FutureProvider((ref) async {
@@ -18,7 +16,7 @@ class LeaderboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(leaderboardProvider).when(data: (data) {
       if (data == null) {
-        return Center(child: Text('No data'));
+        return const Center(child: Text('No data'));
       }
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),

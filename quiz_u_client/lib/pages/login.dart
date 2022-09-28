@@ -1,14 +1,12 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phone_number/phone_number.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/components/drop_down.dart';
 import 'package:quiz_u_client/main.dart';
-import 'package:quiz_u_client/utils/auth_redirect.dart';
 
 final _formKey = GlobalKey<FormBuilderState>();
 
@@ -31,13 +29,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     var selectedRegionCode = ref.watch(dialogCode);
-    var perf = ref.watch(sharedPreferencesProvider).value;
     return PageContainer(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -51,7 +47,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: CustomDropDownButton(
-                    items: {
+                    items: const {
                       "+966": "SA",
                       "+967": "YE",
                       "+968": "OM",
@@ -63,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: FormBuilder(
                 key: _formKey,
                 child: FormBuilderTextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       border: OutlineInputBorder(), hintText: "55 555 5555"),
                   name: 'phone_number',
                 ),

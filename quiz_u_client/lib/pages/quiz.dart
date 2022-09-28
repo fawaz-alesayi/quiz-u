@@ -1,18 +1,17 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/score.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/models/quizAttempt.dart';
 import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const QuizDuration = Duration(seconds: 5);
 
@@ -20,9 +19,9 @@ class QuizPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(quizProvider).when(
-        loading: () =>
-            PageContainer(child: Center(child: CircularProgressIndicator())),
-        error: (error, stack) => PageContainer(
+        loading: () => const PageContainer(
+            child: Center(child: CircularProgressIndicator())),
+        error: (error, stack) => const PageContainer(
             child: Center(child: Text("Sorry can't load the quiz right now"))),
         data: (data) {
           final quesitons = data!.questions;
@@ -85,7 +84,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         onFinish();
       }
     });
-    clock = Timer.periodic(Duration(seconds: 1), (_) => setCountDown());
+    clock = Timer.periodic(const Duration(seconds: 1), (_) => setCountDown());
   }
 
   void setCountDown() {
@@ -195,7 +194,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.close,
                     color: Colors.blue,
                   )),
@@ -206,17 +205,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Time left: $minutes:$seconds"),
-                    SizedBox(height: 20),
-                    Text("You finished the quiz!"),
-                    SizedBox(height: 20),
-                    Text("Your score was ${score}/${widget.questions.length}"),
+                    const SizedBox(height: 20),
+                    const Text("You finished the quiz!"),
+                    const SizedBox(height: 20),
+                    Text("Your score was $score/${widget.questions.length}"),
                     // Share button
                     OutlinedButton(
                       onPressed: () {
                         Share.share(
-                            "I answered ${score} correct answers in QuizU!");
+                            "I answered $score correct answers in QuizU!");
                       },
-                      child: Text("Share your score"),
+                      child: const Text("Share your score"),
                     ),
                   ],
                 ),
@@ -230,7 +229,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Time left: $minutes:$seconds"),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(widget.questions[questionIndex].question),
             for (var answer
                 in widget.questions[questionIndex].answers.entries) ...{
@@ -238,7 +237,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                   onPressed: () {
                     if (correct(widget.questions[questionIndex], answer.key)) {
                       debugPrint(
-                          "Answered to question ${questionIndex} correctly");
+                          "Answered to question $questionIndex correctly");
                       // Move to next question
                       setState(() {
                         score++;
@@ -247,7 +246,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                       });
                     } else {
                       debugPrint(
-                          "Answered to question ${questionIndex} incorrectly");
+                          "Answered to question $questionIndex incorrectly");
                       setState(() {
                         failedQuiz = true;
                       });
@@ -263,7 +262,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                       questionIndex++;
                     });
                   },
-                  child: Text("Skip"))
+                  child: const Text("Skip"))
             }
           ],
         ),
@@ -278,7 +277,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.close,
                   color: Colors.blue,
                 )),
@@ -290,17 +289,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Exit button
-                  Text(
+                  const Text(
                     "Wrong Answer. You failed the quiz 😔",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                       onPressed: () {
                         resetQuiz();
                       },
-                      child: Text("Try Again"))
+                      child: const Text("Try Again"))
                 ],
               ),
             ),

@@ -1,13 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_u_client/api/name.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 
 final nameProvider = StateProvider((ref) => '');
 
 class NamePage extends ConsumerWidget {
+  const NamePage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var name = ref.watch(nameProvider);

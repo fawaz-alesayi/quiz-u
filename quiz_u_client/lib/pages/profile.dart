@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +20,8 @@ var profileProvider = FutureProvider((ref) async {
 });
 
 class ProfilePage extends ConsumerWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(profileProvider).when(data: (data) {
@@ -29,7 +31,7 @@ class ProfilePage extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(children: [
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
@@ -53,10 +55,10 @@ class ProfilePage extends ConsumerWidget {
                 const SizedBox(height: 20),
                 Text('Mobile: ${data.mobile}',
                     style: const TextStyle(fontSize: 20)),
-                SizedBox(height: 60),
-                Text('Previous attempts',
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 60),
+                const Text('Previous attempts',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 PreviousAttempts(),
               ],
@@ -74,12 +76,13 @@ class ProfilePage extends ConsumerWidget {
   Future<void> logout(WidgetRef ref, BuildContext context) async {
     var pref = await ref.watch(sharedPreferencesProvider.future);
     await pref.clear();
-    // navigate to login
     Navigator.pushReplacementNamed(context, Routes.login);
   }
 }
 
 class PreviousAttempts extends ConsumerWidget {
+  const PreviousAttempts({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(quizAttemptProvider).when(data: (data) {
@@ -98,7 +101,7 @@ class PreviousAttempts extends ConsumerWidget {
                             children: [
                               // first Text contains date and time in this format: XX:XX AM/PM on DD/MM/YYYY
                               // second Text contains score
-                              Text('${formatDate(e.date)}',
+                              Text(formatDate(e.date),
                                   style: const TextStyle(fontSize: 20)),
                               Text('${e.score} / ${e.quiz.questions.length}',
                                   style: const TextStyle(fontSize: 20)),

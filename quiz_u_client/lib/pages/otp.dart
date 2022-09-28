@@ -1,14 +1,12 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quiz_u_client/api/login.dart';
-import 'package:quiz_u_client/components/PageContainer.dart';
+import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/main.dart';
-import 'package:quiz_u_client/models/otp.dart';
 import 'package:quiz_u_client/pages/login.dart';
-import 'package:quiz_u_client/utils/auth_redirect.dart';
 
 final otpProvider = StateProvider<String>((ref) => "");
 

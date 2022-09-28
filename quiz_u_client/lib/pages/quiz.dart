@@ -10,11 +10,11 @@ import 'package:quiz_u_client/components/page_container.dart';
 import 'package:quiz_u_client/main.dart';
 import 'package:quiz_u_client/models/quiz.dart';
 import 'package:quiz_u_client/models/quizAttempt.dart';
-import 'package:quiz_u_client/pages/home.dart';
+import 'package:quiz_u_client/pages/tabs/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:share_plus/share_plus.dart';
 
-const QuizDuration = Duration(seconds: 600);
+const QuizDuration = Duration(seconds: 120);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -182,7 +182,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
     if (!failedQuiz) {
       if (((questionIndex + 1) > widget.questions.length) || timerFinished) {
         stopTimer();
-        // postResult();
+        postResult();
         if (score < 30) {
           player.setAsset('assets/audio/finish.wav');
           player.play();

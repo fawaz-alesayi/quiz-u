@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiz_u_client/pages/home.dart';
-import 'package:quiz_u_client/pages/leaderboards.dart';
+import 'package:quiz_u_client/pages/tabs/home.dart';
+import 'package:quiz_u_client/pages/tabs/leaderboards.dart';
 import 'package:quiz_u_client/pages/login.dart';
 import 'package:quiz_u_client/pages/name.dart';
 import 'package:quiz_u_client/pages/otp.dart';
-import 'package:quiz_u_client/pages/profile.dart';
+import 'package:quiz_u_client/pages/tabs/profile.dart';
 import 'package:quiz_u_client/pages/quiz.dart';
 import 'package:quiz_u_client/pages/splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';

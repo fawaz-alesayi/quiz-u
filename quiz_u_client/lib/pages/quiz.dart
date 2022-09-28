@@ -13,7 +13,7 @@ import 'package:quiz_u_client/pages/home.dart';
 import 'package:quiz_u_client/pages/otp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const QuizDuration = Duration(seconds: 10);
+const QuizDuration = Duration(seconds: 5);
 
 class QuizPage extends ConsumerWidget {
   @override
@@ -34,20 +34,8 @@ class QuizPage extends ConsumerWidget {
 
 class QuestionsWidget extends ConsumerStatefulWidget {
   final List<Question> questions;
-  int questionIndex = 0;
-  int score = 0;
-  bool failedQuiz = false;
-  Duration quizDuration = QuizDuration;
-  bool skipUsed = false;
-  DateTime? startTime;
 
-  /// Answers given
-  List<String> answers = [];
-
-  /// quizTimer is only responsible for what happens after the quiz ends
-  Timer? quizTimer;
-
-  QuestionsWidget({Key? key, required this.questions}) : super(key: key);
+  const QuestionsWidget({Key? key, required this.questions}) : super(key: key);
 
   @override
   ConsumerState<QuestionsWidget> createState() => _QuestionsWidgetState();
@@ -57,14 +45,28 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
   /// Clock is what drives the re-renders of this widget. it reduces QuizDuration by 1 second every second
   Timer? clock;
 
+  bool timerFinished = false;
+  Duration quizDuration = QuizDuration;
+  bool failedQuiz = false;
+  int questionIndex = 0;
+  int score = 0;
+  bool skipUsed = false;
+  DateTime? startTime;
+
+  /// Answers given
+  List<String> answers = [];
+
+  /// quizTimer is only responsible for what happens after the quiz ends
+  Timer? quizTimer;
+
   @override
   void initState() {
     super.initState();
     startTimer(onFinish: () {
-      widget.failedQuiz = false;
-      widget.questionIndex = widget.questions.length;
+      failedQuiz = false;
+      timerFinished = true;
     });
-    widget.startTime = DateTime.now();
+    startTime = DateTime.now();
   }
 
   /// clear timers when this widget gets removed
@@ -72,11 +74,11 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
   void dispose() {
     super.dispose();
     clock!.cancel();
-    widget.quizTimer!.cancel();
+    quizTimer!.cancel();
   }
 
   void startTimer({Function? onFinish}) {
-    widget.quizTimer = Timer(widget.quizDuration, () {
+    quizTimer = Timer(quizDuration, () {
       debugPrint("Timer finished");
       if (onFinish != null) {
         onFinish();
@@ -87,44 +89,55 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
 
   void setCountDown() {
     setState(() {
-      final seconds = widget.quizDuration.inSeconds - 1;
+      final seconds = quizDuration.inSeconds - 1;
       if (seconds < 0) {
-        widget.quizTimer!.cancel();
+        quizTimer!.cancel();
       } else {
-        widget.quizDuration = Duration(seconds: seconds);
+        quizDuration = Duration(seconds: seconds);
       }
     });
   }
 
   void stopTimer() {
-    setState(() => clock!.cancel());
+    setState(() {
+      clock!.cancel();
+      quizTimer!.cancel();
+    });
   }
 
   void resetTimer() {
     stopTimer();
     setState(() {
-      widget.quizDuration = QuizDuration;
+      timerFinished = false;
+      quizDuration = QuizDuration;
     });
   }
 
   void resetQuiz() {
     setState(() {
-      widget.failedQuiz = false;
-      widget.questionIndex = 0;
-      widget.skipUsed = false;
+      failedQuiz = false;
+      questionIndex = 0;
+      skipUsed = false;
     });
     resetTimer();
     startTimer(onFinish: () {
-      widget.failedQuiz = false;
-      widget.questionIndex = widget.questions.length;
+      failedQuiz = false;
+      timerFinished = true;
     });
+  }
+
+  void failQuiz() {
+    setState(() {
+      failedQuiz = true;
+    });
+    stopTimer();
   }
 
   void postResult() async {
     // get shared prefrences
     var pref = await ref.watch(sharedPreferencesProvider.future);
     var response = await postScore(
-        token: pref.getString('token')!, score: widget.score.toString());
+        token: pref.getString('token')!, score: score.toString());
     if (response == null) {
       showErrorSnackBar(
           context, "Sorry, we could not add your score to the leaderbords.");
@@ -158,17 +171,17 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       return n.toString().padLeft(2, '0');
     }
 
-    final minutes = strDigits(widget.quizDuration.inMinutes.remainder(60));
-    final seconds = strDigits((widget.quizDuration.inSeconds).remainder(60));
-    if (!widget.failedQuiz) {
-      if ((widget.questionIndex + 1) > widget.questions.length) {
+    final minutes = strDigits(quizDuration.inMinutes.remainder(60));
+    final seconds = strDigits((quizDuration.inSeconds).remainder(60));
+    if (!failedQuiz) {
+      if (((questionIndex + 1) > widget.questions.length) || timerFinished) {
         stopTimer();
-        postResult();
-        saveResultLocally(QuizAttempt(
-            choices: widget.answers,
-            score: widget.score,
-            date: widget.startTime!,
-            quiz: Quiz(questions: widget.questions)));
+        // postResult();
+        // saveResultLocally(QuizAttempt(
+        //     choices: answers,
+        //     score: score,
+        //     date: startTime!,
+        //     quiz: Quiz(questions: widget.questions)));
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -177,7 +190,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
               SizedBox(height: 20),
               Text("You finished the quiz!"),
               SizedBox(height: 20),
-              Text("Your score was ${widget.score}/${widget.questions.length}"),
+              Text("Your score was ${score}/${widget.questions.length}"),
               TextButton(
                   onPressed: () {
                     resetQuiz();
@@ -193,37 +206,36 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
           children: [
             Text("Time left: $minutes:$seconds"),
             SizedBox(height: 20),
-            Text(widget.questions[widget.questionIndex].question),
+            Text(widget.questions[questionIndex].question),
             for (var answer
-                in widget.questions[widget.questionIndex].answers.entries) ...{
+                in widget.questions[questionIndex].answers.entries) ...{
               TextButton(
                   onPressed: () {
-                    if (correct(
-                        widget.questions[widget.questionIndex], answer.key)) {
+                    if (correct(widget.questions[questionIndex], answer.key)) {
                       debugPrint(
-                          "Answered to question ${widget.questionIndex} correctly");
+                          "Answered to question ${questionIndex} correctly");
                       // Move to next question
                       setState(() {
-                        widget.score++;
-                        widget.questionIndex++;
-                        widget.answers.add(answer.key);
+                        score++;
+                        questionIndex++;
+                        answers.add(answer.key);
                       });
                     } else {
                       debugPrint(
-                          "Answered to question ${widget.questionIndex} incorrectly");
+                          "Answered to question ${questionIndex} incorrectly");
                       setState(() {
-                        widget.failedQuiz = true;
+                        failedQuiz = true;
                       });
                     }
                   },
                   child: Text("${answer.key}. ${answer.value}")),
             },
-            if (!widget.skipUsed) ...{
+            if (!skipUsed) ...{
               ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      widget.skipUsed = true;
-                      widget.questionIndex++;
+                      skipUsed = true;
+                      questionIndex++;
                     });
                   },
                   child: Text("Skip"))
@@ -232,6 +244,7 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         ),
       );
     } else {
+      stopTimer();
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

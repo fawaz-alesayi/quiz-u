@@ -11,7 +11,6 @@ var quizAttemptProvider = FutureProvider((ref) async {
   debugPrint("Triggered quizAttemptProvider");
   var pref = await ref.watch(sharedPreferencesProvider.future);
   var attemptsRaw = pref.getStringList('quiz_attempts');
-  debugPrint('attemptsRaw: $attemptsRaw');
   return attemptsRaw?.map((e) => QuizAttempt.fromJson(e)).toList();
 });
 

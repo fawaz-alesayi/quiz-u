@@ -29,16 +29,23 @@ class HomePage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text('QuizU',
-                  style:
-                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w800)),
               const SizedBox(height: 20),
-              Text('Ready to start the Quiz, ${perf?.getString('name')}?'),
+              Text(
+                'Ready to start the Quiz, ${perf?.getString('name')}?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  
+                ),
+              ),
               // Text("Your token is ${perf.getString("token")}"),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   debugPrint("Your token is ${perf?.getString("token")}");
-                  Navigator.pushReplacementNamed(context, Routes.quiz);
+                  Navigator.pushNamed(context, Routes.quiz);
                 },
                 child: const Text('Start Quiz'),
               ),

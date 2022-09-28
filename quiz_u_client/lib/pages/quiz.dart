@@ -182,22 +182,41 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
         //     score: score,
         //     date: startTime!,
         //     quiz: Quiz(questions: widget.questions)));
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Time left: $minutes:$seconds"),
-              SizedBox(height: 20),
-              Text("You finished the quiz!"),
-              SizedBox(height: 20),
-              Text("Your score was ${score}/${widget.questions.length}"),
-              TextButton(
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Exit button
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
                   onPressed: () {
-                    resetQuiz();
+                    Navigator.pop(context);
                   },
-                  child: Text("Restart quiz"))
-            ],
-          ),
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.blue,
+                  )),
+            ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Time left: $minutes:$seconds"),
+                    SizedBox(height: 20),
+                    Text("You finished the quiz!"),
+                    SizedBox(height: 20),
+                    Text("Your score was ${score}/${widget.questions.length}"),
+                    TextButton(
+                        onPressed: () {
+                          resetQuiz();
+                        },
+                        child: Text("Restart quiz"))
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       }
       return Center(
@@ -245,18 +264,42 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
       );
     } else {
       stopTimer();
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Wrong Answer. You failed the quiz 😔."),
-            ElevatedButton(
+      return Column(
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
                 onPressed: () {
-                  resetQuiz();
+                  Navigator.pop(context);
                 },
-                child: Text("Retry the quiz"))
-          ],
-        ),
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.blue,
+                )),
+          ),
+          // Exit button
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Exit button
+                  Text(
+                    "Wrong Answer. You failed the quiz 😔",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () {
+                        resetQuiz();
+                      },
+                      child: Text("Try Again"))
+                ],
+              ),
+            ),
+          ),
+        ],
       );
     }
   }

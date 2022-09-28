@@ -210,11 +210,6 @@ class _QuestionsWidgetState extends ConsumerState<QuestionsWidget> {
                     Text("You finished the quiz!"),
                     SizedBox(height: 20),
                     Text("Your score was ${score}/${widget.questions.length}"),
-                    TextButton(
-                        onPressed: () {
-                          resetQuiz();
-                        },
-                        child: Text("Restart quiz")),
                     // Share button
                     OutlinedButton(
                       onPressed: () {
